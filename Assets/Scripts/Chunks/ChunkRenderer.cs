@@ -32,13 +32,17 @@ public class ChunkRenderer : MonoBehaviour
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
 
-        var counter = -1;
+        var amountOfVertices = -8;
         for (var x = 0; x < _chunk.ChunkSize; ++x)
         for (var z = 0; z < _chunk.ChunkSize; ++z)
         for (var y = 0; y < _chunk.ChunkHeight; ++y)
         {
-            ++counter;
+            var blockType = _chunk.Blocks[x, y, z];
+            if (blockType is BlockType.Air or BlockType.Nothing)
+                continue;
+            
             var position = new Vector3Int(x, y, z);
+            amountOfVertices += 8;
             vertices.AddRange(new[]
             {
                 new Vector3(0, 0, 0) + position,
@@ -50,10 +54,6 @@ public class ChunkRenderer : MonoBehaviour
                 new Vector3(1, 0, 1) + position,
                 new Vector3(0, 0, 1) + position
             });
-            
-            var blockType = _chunk.Blocks[x, y, z];
-            if (blockType is BlockType.Air or BlockType.Nothing)
-                continue;
             
             var faces = new List<Face>();
             foreach (var face in Faces.All)
@@ -72,7 +72,7 @@ public class ChunkRenderer : MonoBehaviour
                 faces.Add(face);
             }
 
-            var nextTriangles = CalculateTriangles(faces).Select(triangle => triangle + counter * 8).ToList();
+            var nextTriangles = CalculateTriangles(faces).Select(triangle => triangle + amountOfVertices).ToList();
             triangles.AddRange(nextTriangles);
         }
 
