@@ -64,9 +64,6 @@ public class ChunkRenderer : MonoBehaviour
                 {
                     var neighbourBlockPosition = position.TranslateToNeighbourChunkPosition(face);
                     neighbourBlockType = neighbourChunk.GetBlockType(neighbourBlockPosition);
-
-                    // if (y == 6 && x == 5 && z == 0 && _chunk.WorldPosition.x == 0 && _chunk.WorldPosition.y == 0 && _chunk.WorldPosition.z == 32)
-                    //     neighbourBlockType = BlockType.Air;
                 }
 
                 if (neighbourBlockType == BlockType.Dirt || neighbourBlockType == BlockType.Nothing)
