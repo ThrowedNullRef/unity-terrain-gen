@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class Vector3IntExtensions
 {
-    public static Vector3Int TranslateToNeighbourChunkPosition(this Vector3Int position, Face face)
+    public static Vector3Int TranslateToNeighbourChunkPosition(this Vector3Int position, Face face, World world)
     {
         var directionVector = face.GetDirectionVector();
 
@@ -13,21 +13,21 @@ public static class Vector3IntExtensions
         neighbourX = directionVector.x switch
         {
             1 => 0,
-            -1 => World.CHUNK_SIZE - 1,
+            -1 => world.ChunkSize - 1,
             _ => neighbourX
         };
 
         neighbourY = directionVector.y switch
         {
             1 => 0,
-            -1 => World.CHUNK_SIZE - 1,
+            -1 => world.ChunkSize - 1,
             _ => neighbourY
         };
 
         neighbourZ = directionVector.z switch
         {
             1 => 0,
-            -1 => World.CHUNK_SIZE - 1,
+            -1 => world.ChunkSize - 1,
             _ => neighbourZ
         };
 

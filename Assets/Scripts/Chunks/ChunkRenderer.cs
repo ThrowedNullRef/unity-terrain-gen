@@ -62,11 +62,11 @@ public class ChunkRenderer : MonoBehaviour
                 if (neighbourBlockType == BlockType.Nothing &&
                     _world.TryGetChunkNeighbour(_chunk.WorldPosition, face, out var neighbourChunk))
                 {
-                    var neighbourBlockPosition = position.TranslateToNeighbourChunkPosition(face);
+                    var neighbourBlockPosition = position.TranslateToNeighbourChunkPosition(face, _world);
                     neighbourBlockType = neighbourChunk.GetBlockType(neighbourBlockPosition);
                 }
 
-                if (neighbourBlockType == BlockType.Dirt || neighbourBlockType == BlockType.Nothing)
+                if (neighbourBlockType is BlockType.Dirt or BlockType.Nothing)
                     continue;
 
                 faces.Add(face);
