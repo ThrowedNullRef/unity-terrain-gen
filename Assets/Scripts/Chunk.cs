@@ -2,12 +2,17 @@ using UnityEngine;
 
 public sealed class Chunk
 {
-    public Chunk(Vector3 worldPosition, BlockType[,,] blocks)
+    public Chunk(Vector3 worldPosition, int chunkSize, int chunkHeight)
     {
         WorldPosition = worldPosition;
+        Blocks = new BlockType[chunkSize, chunkHeight, chunkSize];
+        ChunkSize = chunkSize;
+        ChunkHeight = chunkHeight;
+    }
+
+    public Chunk(Vector3 worldPosition, BlockType[,,] blocks) : this(worldPosition, blocks.GetLength(0), blocks.GetLength(1))
+    {
         Blocks = blocks;
-        ChunkSize = blocks.GetLength(0);
-        ChunkHeight = blocks.GetLength(1);
     }
 
     public Vector3 WorldPosition { get; }

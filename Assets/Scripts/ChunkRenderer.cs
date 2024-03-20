@@ -2,16 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class ChunkRenderer : MonoBehaviour
 {
     private Chunk _chunk;
-    private World _world;
     private Mesh _mesh;
     private MeshFilter _meshFilter;
+    private World _world;
 
     private void Awake()
     {
@@ -33,58 +32,62 @@ public class ChunkRenderer : MonoBehaviour
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
 
-        var counter = 0;
+        var counter = -1;
         for (var x = 0; x < _chunk.ChunkSize; ++x)
+        for (var z = 0; z < _chunk.ChunkSize; ++z)
+        for (var y = 0; y < _chunk.ChunkHeight; ++y)
         {
-            for (var z = 0; z < _chunk.ChunkSize; ++z)
+            ++counter;
+            var position = new Vector3Int(x, y, z);
+            vertices.AddRange(new[]
             {
-                for (var y = 0; y < _chunk.ChunkHeight; ++y)
+                new Vector3(0, 0, 0) + position,
+                new Vector3(1, 0, 0) + position,
+                new Vector3(1, 1, 0) + position,
+                new Vector3(0, 1, 0) + position,
+                new Vector3(0, 1, 1) + position,
+                new Vector3(1, 1, 1) + position,
+                new Vector3(1, 0, 1) + position,
+                new Vector3(0, 0, 1) + position
+            });
+            
+            var blockType = _chunk.Blocks[x, y, z];
+            if (blockType is BlockType.Air or BlockType.Nothing)
+                continue;
+            
+            var faces = new List<Face>();
+            foreach (var face in Faces.All)
+            {
+                var neighbourBlockType = _chunk.GetBlockTypeOfNeighbour(position, face);
+                if (neighbourBlockType == BlockType.Nothing &&
+                    _world.TryGetChunkNeighbour(_chunk.WorldPosition, face, out var neighbourChunk))
                 {
-                    var blockType = _chunk.Blocks[x, y, z];
-                    if (blockType is BlockType.Air or BlockType.Nothing)
-                        continue;
-                    
-                    var blockWorldPosition = new Vector3(x + _chunk.WorldPosition.x, y + _chunk.WorldPosition.y, z + _chunk.WorldPosition.z);
-                    vertices.AddRange(new []
-                    {
-                        new Vector3(0, 0, 0) + blockWorldPosition,
-                        new Vector3(1, 0, 0) + blockWorldPosition,
-                        new Vector3(1, 1, 0) + blockWorldPosition,
-                        new Vector3(0, 1, 0) + blockWorldPosition,
-                        new Vector3(0, 1, 1) + blockWorldPosition,
-                        new Vector3(1, 1, 1) + blockWorldPosition,
-                        new Vector3(1, 0, 1) + blockWorldPosition,
-                        new Vector3(0, 0, 1) + blockWorldPosition
-                    });
-        
-                    var faces = new List<Face>();
-                    foreach (var face in Faces.All)
-                    {
-                        var neighbourBlockType = _chunk.GetBlockTypeOfNeighbour(x, y, z, face);
-                        if (neighbourBlockType == BlockType.Nothing && _world.TryGetChunkNeighbour(_chunk.WorldPosition, face, out var neighbourChunk))
-                            neighbourBlockType = neighbourChunk.GetBlockType(x, y, z);
+                    var neighbourBlockPosition = position.TranslateToNeighbourChunkPosition(face);
+                    neighbourBlockType = neighbourChunk.GetBlockType(neighbourBlockPosition);
 
-                        if (neighbourBlockType == BlockType.Dirt)
-                            continue;
-                        
-                        faces.Add(face);
-                    }
-        
-                    var nextTriangles = CalculateTriangles(faces).Select(triangle => triangle + (counter * 8)).ToList();
-                    triangles.AddRange(nextTriangles);
-                    ++counter;
+                    // if (y == 6 && x == 5 && z == 0 && _chunk.WorldPosition.x == 0 && _chunk.WorldPosition.y == 0 && _chunk.WorldPosition.z == 32)
+                    //     neighbourBlockType = BlockType.Air;
                 }
-            }   
+
+                if (neighbourBlockType == BlockType.Dirt || neighbourBlockType == BlockType.Nothing)
+                    continue;
+
+                faces.Add(face);
+            }
+
+            var nextTriangles = CalculateTriangles(faces).Select(triangle => triangle + counter * 8).ToList();
+            triangles.AddRange(nextTriangles);
         }
-        
+
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
+        mesh.Optimize();
         mesh.RecalculateNormals();
         _meshFilter.mesh = mesh;
     }
 
-    private List<int> CalculateTriangles(List<Face> facesToRender)
+    private static List<int> CalculateTriangles(List<Face> facesToRender)
     {
         var triangles = new List<int>(facesToRender.Count * 6);
 
