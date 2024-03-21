@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using Chunks;
+using FrameworkExtensions;
 using UnityEngine;
 using UnityEngine.UIElements;
+using WorldForging;
 
 public sealed class World
 {
@@ -11,7 +14,7 @@ public sealed class World
     // public const int CHUNK_HEIGHT = 255;
     public int ChunkSize = 8;
     public int ChunkHeight = 80;
-    public int WorldSize = 30;
+    public int WorldSize = 25;
     
     public Dictionary<Vector3, Chunk> ChunksByPositions { get; } = new ();
     

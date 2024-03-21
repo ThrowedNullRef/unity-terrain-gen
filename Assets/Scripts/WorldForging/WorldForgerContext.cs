@@ -1,11 +1,15 @@
 using System.Collections.Generic;
+using Chunks;
 
-public sealed class WorldForgerContext
+namespace WorldForging
 {
-    public WorldForgerContext(int amountOfChunks)
+    public sealed class WorldForgerContext
     {
-        Chunks = new List<Chunk>(amountOfChunks);
-    }
+        public WorldForgerContext(int amountOfChunks)
+        {
+            Chunks = new List<Chunk>(amountOfChunks);
+        }
     
-    public List<Chunk> Chunks { get; }
+        public List<Chunk> Chunks { get; }
+    }
 }

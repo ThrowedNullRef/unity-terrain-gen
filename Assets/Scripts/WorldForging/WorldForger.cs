@@ -1,25 +1,28 @@
 using System.Collections.Generic;
 
-public sealed class WorldForger
+namespace WorldForging
 {
-    public WorldForgerContext Forge(WorldForgerRequest request)
+    public sealed class WorldForger
     {
-        var context = new WorldForgerContext(request.ChunkPositions.Count);
-        var steps = CreateSteps(context, request);
-        
-        foreach (var step in steps)
+        public WorldForgerContext Forge(WorldForgerRequest request)
         {
-            step.Forge();
+            var context = new WorldForgerContext(request.ChunkPositions.Count);
+            var steps = CreateSteps(context, request);
+        
+            foreach (var step in steps)
+            {
+                step.Forge();
+            }
+
+            return context;
         }
 
-        return context;
-    }
-
-    private List<IWorldForgerStep> CreateSteps(WorldForgerContext context, WorldForgerRequest request)
-    {
-        return new()
+        private List<IWorldForgerStep> CreateSteps(WorldForgerContext context, WorldForgerRequest request)
         {
-            new CreateBaseTerrainStep(context, request)
-        };
+            return new()
+            {
+                new CreateBaseTerrainStep(context, request)
+            };
+        }
     }
 }

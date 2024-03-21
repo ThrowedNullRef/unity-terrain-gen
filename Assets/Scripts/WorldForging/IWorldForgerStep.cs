@@ -1,4 +1,7 @@
-public interface IWorldForgerStep
+namespace WorldForging
 {
-    void Forge();
+    public interface IWorldForgerStep
+    {
+        void Forge();
+    }
 }
